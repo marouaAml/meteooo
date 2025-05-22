@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Météo en Temps Réel</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-image: url('images/bg.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #fff;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    #weather-container {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+      backdrop-filter: blur(5px);
+    }
+
+    input[type="text"] {
+      width: 70%;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      outline: none;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background-color: #00bcd4;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0097a7;
+    }
+
+    #weather {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+      font-size: 18px;
+    }
+
+    #weather p {
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Météo en Temps Réel 🌦️</h1>
+
+  <div id="weather-container">
+    <input type="text" id="city" placeholder="Entrez une ville">
+    <br>
+    <button onclick="getWeather()">Voir la météo</button>
+    <div id="weather"></div>
+  </div>
+
+  <script>
+    function getWeather() {
+      const city = document.getElementById('city').value.trim();
+      if (!city) return alert("Veuillez entrer une ville.");
+
+      fetch(`meteo.php?city=${encodeURIComponent(city)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.cod !== 200) {
+            document.getElementById('weather').innerHTML = `<p>🌐 Ville introuvable.</p>`;
+            return;
+          }
+
+          const html = `
+            <h2>${data.name}, ${data.sys.country}</h2>
+            <p><strong>${data.weather[0].description}</strong></p>
+            <p>🌡️ Température : ${data.main.temp} °C</p>
+            <p>💨 Vent : ${data.wind.speed} m/s</p>
+            <p>💧 Humidité : ${data.main.humidity}%</p>
+          `;
+          document.getElementById('weather').innerHTML = html;
+        })
+        .catch(error => {
+          console.error('Erreur:', error);
+          document.getElementById('weather').innerHTML = `<p>Une erreur est survenue.</p>`;
+        });
+    }
+  </script>
+
+</body>
+</html>
